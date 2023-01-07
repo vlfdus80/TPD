@@ -3,10 +3,9 @@ export LC_ALL=C;
 
 declare pattern;
 
-if (( $2==1 ));then { pattern='[0-9]{2}/[A-Za-z]{3}/[0-9]{4}'; }
-elif (( $2==2 ));then { pattern='[0-9]{4}.[0-9]{2}.[0-9]{2}'; } fi
-#pattern='[0-9]{2}/[A-Za-z]{3}/[0-9]{4}'; # 22/Sep/2022
-echo $pattern;
+if (( $2==1 ));then { pattern='[0-9]{2}/[A-Za-z]{3}/[0-9]{4}'; }    #20/Sep/2022
+elif (( $2==2 ));then { pattern='[0-9]{4}.[0-9]{2}.[0-9]{2}'; } fi  #2016.07.13
+
 declare -i total;
 
 cat $1/* > tmp_raw.txt;
