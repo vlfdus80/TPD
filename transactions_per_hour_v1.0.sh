@@ -53,3 +53,5 @@ echo -e "SUM : $sumVal\n";
 if (( dynamicVal==sumVal ));then echo "OK"; else echo "Not Mached"; fi
 
 rm tmp.txt
+
+echo "END";
