@@ -25,16 +25,20 @@ echo -e "ETC Count : ${etcVal}\n";
 echo -e "Method Total Count : ${methodTotalVal}\n";
 echo -e "GET AND POST Method to Test Count : ${getpostVal}\n";
 
+grep -ae 'GET' -ae 'POST' $1 > tmp_getpost.txt;
+
 if (( total==methodTotalVal ));then echo "OK"; else echo "Not Mached"; fi
 
 echo "**********Group by Dynamic & Statuc***************";
 declare -i dynamicVal staticVal allticVal;
 
-staticVal=$(grep -ae 'GET' -ae 'POST' $1 | grep -ae '\.png' -ae '\.js' -ae '\.jpg' -ae '\.css' | wc -l | cut -d ' ' -f 1);
-dynamicVal=$(grep -ae 'GET' -ae 'POST' $1 | grep -va '\.png' | grep -va '\.js' | grep -va '\.jpg' | grep -va '\.css' | wc -l | cut -d ' ' -f 1);
+staticVal=$(cat tmp_getpost.txt | grep -ae '\.png' -ae '\.js' -ae '\.jpg' -ae '\.css' | wc -l | cut -d ' ' -f 1);
+dynamicVal=$(cat tmp_getpost.txt | grep -va '\.png' | grep -va '\.js' | grep -va '\.jpg' | grep -va '\.css' | wc -l | cut -d ' ' -f 1);
 allticVal=$(( dynamicVal + staticVal ));
 echo -e "Static pages in GETPOST Count : ${staticVal}\n";
 echo -e "Dynamic pages in GETPOST Count : ${dynamicVal}\n";
+
+cat tmp_getpost.txt | grep -va '\.png' | grep -va '\.js' | grep -va '\.jpg' | grep -va '\.css'  >  tmp_getpost_dynamic.txt;
 
 if (( $getpostVal == $allticVal ));then echo "OK"; else echo "Not Mached"; fi
 
@@ -43,15 +47,14 @@ declare -i sumVal;
 
 echo "Dynamic pages in GET AND POST";
 
-cat $1 | grep -ae 'GET' -ae 'POST' $1 | grep -va '\.png' | grep -va '\.js' | grep -va '\.jpg' | grep -va '\.css' | awk 'BEGIN{} { match($0,/[0-9][0-9]:[0-9][0-9]:[0-9][0-9][ \]]/) } {timeVal[substr($0,RSTART,2)]++;} END {for (key in timeVal) printf("%s : %d\n", key, timeVal[key]);}' | sort -k1 -t" " > tmp.txt
+cat tmp_getpost_dynamic.txt | awk 'BEGIN{} { match($0,/[0-9][0-9]:[0-9][0-9]:[0-9][0-9][ \]]/) } {timeVal[substr($0,RSTART,2)]++;} END {for (key in timeVal) printf("%s : %d\n", key, timeVal[key]);}' | sort -k1 -t" " > tmp_TPH.txt
 
-cat tmp.txt
+cat tmp_TPH.txt
 
-sumVal=$(awk 'BEGIN{FS=" ";}{ sum += $3 } END { print sum }' tmp.txt);
+sumVal=$(awk 'BEGIN{FS=" ";}{ sum += $3 } END { print sum }' tmp_TPH.txt);
 echo -e "SUM : $sumVal\n";
 
 if (( dynamicVal==sumVal ));then echo "OK"; else echo "Not Mached"; fi
 
-rm tmp.txt
+rm tmp_getpost.txt tmp_getpost_dynamic.txt tmp_TPH.txt;
 
-echo "END";
