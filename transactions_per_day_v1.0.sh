@@ -2,7 +2,9 @@
 export LC_ALL=C;
 
 declare pattern;
-pattern='/[0-9]{2}/[A-Za-z]{3}/[0-9]{4}/'; # 22/Sep/2022
+
+if (( $2==1 ));then { pattern='[0-9]{2}/[A-Za-z]{3}/[0-9]{4}'; } fi
+#pattern='[0-9]{2}/[A-Za-z]{3}/[0-9]{4}'; # 22/Sep/2022
 echo $pattern;
 declare -i total;
 
@@ -49,12 +51,12 @@ cat tmp_getpost.txt | grep -va '\.png' | grep -va '\.js' | grep -va '\.jpg' | gr
 
 if (( $getpostVal == $allticVal ));then echo "OK"; else echo "Not Mached"; fi
 
-echo "*********transaction count per hour***************";
+echo "*********transaction count per day****************";
 declare -i sumVal;
 
 echo "Dynamic pages in GET AND POST";
 
-cat tmp_getpost_dynamic.txt | awk -v pattern="$pattern" '{ match($0,/[0-9]{2}\/[A-Za-z]{3}\/[0-9]{4}/) } {timeVal[substr($0,RSTART,11)]++;} END {for (key in timeVal) printf("%s : %d\n", key, timeVal[key]);}' | sort -k1 -t" " > tmp_TPH.txt
+cat tmp_getpost_dynamic.txt | awk -v pattern="$pattern" 'BEGIN{} { match($0,pattern) } {timeVal[substr($0,RSTART,11)]++;} END {for (key in timeVal) printf("%s : %d\n", key, timeVal[key]);}' | sort -k1 -t" " > tmp_TPH.txt
 
 cat tmp_TPH.txt
 
@@ -63,5 +65,5 @@ echo -e "SUM : $sumVal\n";
 
 if (( dynamicVal==sumVal ));then echo "OK"; else echo "Not Mached"; fi
 
-rm tmp_getpost.txt tmp_getpost_dynamic.txt tmp_TPH.txt;
+#rm tmp_getpost.txt tmp_getpost_dynamic.txt tmp_TPH.txt;
 
