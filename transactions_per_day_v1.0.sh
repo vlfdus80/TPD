@@ -3,7 +3,8 @@ export LC_ALL=C;
 
 declare pattern;
 
-if (( $2==1 ));then { pattern='[0-9]{2}/[A-Za-z]{3}/[0-9]{4}'; } fi
+if (( $2==1 ));then { pattern='[0-9]{2}/[A-Za-z]{3}/[0-9]{4}'; }
+elif (( $2==2 ));then { pattern='[0-9]{4}.[0-9]{2}.[0-9]{2}'; } fi
 #pattern='[0-9]{2}/[A-Za-z]{3}/[0-9]{4}'; # 22/Sep/2022
 echo $pattern;
 declare -i total;
@@ -41,13 +42,13 @@ if (( total==methodTotalVal ));then echo "OK"; else echo "Not Mached"; fi
 echo "**********Group by Dynamic & Statuc***************";
 declare -i dynamicVal staticVal allticVal;
 
-staticVal=$(cat tmp_getpost.txt | grep -ae '\.png' -ae '\.js' -ae '\.jpg' -ae '\.css' | wc -l | cut -d ' ' -f 1);
-dynamicVal=$(cat tmp_getpost.txt | grep -va '\.png' | grep -va '\.js' | grep -va '\.jpg' | grep -va '\.css' | wc -l | cut -d ' ' -f 1);
+staticVal=$(cat tmp_getpost.txt | grep -ae '\.png' -ae '\.js[^a-z]' -ae '\.jpg' -ae '\.css' | wc -l | cut -d ' ' -f 1);
+dynamicVal=$(cat tmp_getpost.txt | grep -va '\.png' | grep -va '\.js[^a-z]' | grep -va '\.jpg' | grep -va '\.css' | wc -l | cut -d ' ' -f 1);
 allticVal=$(( dynamicVal + staticVal ));
 echo -e "Static pages in GETPOST Count : ${staticVal}\n";
 echo -e "Dynamic pages in GETPOST Count : ${dynamicVal}\n";
 
-cat tmp_getpost.txt | grep -va '\.png' | grep -va '\.js' | grep -va '\.jpg' | grep -va '\.css'  >  tmp_getpost_dynamic.txt;
+cat tmp_getpost.txt | grep -va '\.png' | grep -va '\.js[^a-z]' | grep -va '\.jpg' | grep -va '\.css'  >  tmp_getpost_dynamic.txt;
 
 if (( $getpostVal == $allticVal ));then echo "OK"; else echo "Not Mached"; fi
 
@@ -56,14 +57,14 @@ declare -i sumVal;
 
 echo "Dynamic pages in GET AND POST";
 
-cat tmp_getpost_dynamic.txt | awk -v pattern="$pattern" 'BEGIN{} { match($0,pattern) } {timeVal[substr($0,RSTART,11)]++;} END {for (key in timeVal) printf("%s : %d\n", key, timeVal[key]);}' | sort -k1 -t" " > tmp_TPH.txt
+cat tmp_getpost_dynamic.txt | awk -v pattern="$pattern" 'BEGIN{} { match($0,pattern) } {timeVal[substr($0,RSTART,11)]++;} END {for (key in timeVal) printf("%s : %d\n", key, timeVal[key]);}' | sort -k1 -t" " > tmp_TPD.txt
 
-cat tmp_TPH.txt
+cat tmp_TPD.txt
 
-sumVal=$(awk 'BEGIN{FS=" ";}{ sum += $3 } END { print sum }' tmp_TPH.txt);
+sumVal=$(awk 'BEGIN{FS=" ";}{ sum += $3 } END { print sum }' tmp_TPD.txt);
 echo -e "SUM : $sumVal\n";
 
 if (( dynamicVal==sumVal ));then echo "OK"; else echo "Not Mached"; fi
 
-#rm tmp_getpost.txt tmp_getpost_dynamic.txt tmp_TPH.txt;
+#rm tmp_getpost.txt tmp_getpost_dynamic.txt tmp_TPD.txt;
 
